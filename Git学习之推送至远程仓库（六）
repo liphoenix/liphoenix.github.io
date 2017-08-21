@@ -1,0 +1,32 @@
+Git是分散型版本管理系统，但我们前面所学习的，都是针对单一本地仓库的操作。下面，我们将开始接触远在网络另一头的远程仓库。远程仓库顾名思义，是与我们本地仓库相对独立的另一个仓库。让我们现在GitHub上创建一个仓库，并将其设置为本地仓库的远程仓库。
+为防止与其他仓库混淆，仓库名请与本地仓库保持一致，即git-learn。创建时请不要勾选Initialize this repository with a README选项。因为一旦勾选该选项，GitHub一侧的仓库就会自动生成README文件，从创建之初便与本地仓库失去了整合性。虽然到时也可以强制覆盖，但为防止这一情况发生还是建议不要勾选该选项，直接点击Create repository创建仓库。
+添加远程仓库
+git remote add
+在GitHub上创建的仓库路径为“git@github.com:用户名/git-learn.git”。现在我们用git remote add命令将它设置成本地仓库的远程仓库。
+$ git remote add origin git@github.com:weirubo/git-learn.git
+按照上述格式执行git remote add命令之后，Git会自动将git@github.com:weirubo/git-learn.git远程仓库的名称设置为origin（标识符）。
+推送至远程仓库
+git push
+如果想将当前分支下本地仓库中的内容推送给远程仓库，需要用到git push命令。现在假定我们在master分支下进行操作。
+$ git push -u origin master
+Counting objects: 23, done.
+Delta compression using up to 4 threads.
+Compressing objects: 100% (9/9), done.
+Writing objects: 100% (23/23), 1.83 KiB | 0 bytes/s, done.
+Total 23 (delta 3), reused 0 (delta 0)
+To git@github.com:weirubo/git-learn.git
+ * [new branch]      master -> master
+Branch master set up to track remote branch master from origin.
+像这样执行git push命令，当前分支的内容就会被推送给远程仓库origin的master分支。-u参数可以在推送的同时，将origin仓库的master分支设置为本地仓库当前分支的upstream（上游）。添加了这个参数，将来运行git pull命令从远程仓库获取内容时，本地仓库的这个分支就可以直接从origin的master分支获取内容，省去了另外添加参数的麻烦。
+执行该操作后，当前本地仓库master分支的内容将会被推送到GitHub的远程仓库中。在GitHub上也可以确认远程master分支的内容和本地master分支相同。
+推送至master以外的分支
+除了master分支之外，远程仓库也可以创建其他分支。举个例子，我们在本地仓库中创建feature-D分支，并将它以同名形式push至远程仓库。
+$ git checkout -b feature-D
+Switched to a new branch 'feature-D'
+我们在本地仓库中创建了feature-D分支，现在奖它push给远程仓库并保持分支名称不变。
+$ git push -u origin feature-D
+Total 0 (delta 0), reused 0 (delta 0)
+To git@github.com:weirubo/git-learn.git
+ * [new branch]      feature-D -> feature-D
+Branch feature-D set up to track remote branch feature-D from origin.
+现在，在远程仓库的GitHub页面就可以查看到feature-D分支了。
