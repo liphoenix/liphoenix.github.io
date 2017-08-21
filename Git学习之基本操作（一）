@@ -1,0 +1,196 @@
+初始化仓库
+git init
+要使用Git进行版本管理，必须先初始化仓库。Git是使用git init命令进行初始化的。请实际建立一个目录并初始化仓库。
+$ mkdir git-learn
+$ cd git-learn/
+$ git init
+Initialized empty Git repository in /Users/weirubo/www/git-learn/.git/
+如果初始化成功，执行了git init命令的目录下就会生成.git目录。这个.git目录里存储着管理当前目录内容所需的仓库数据。
+在Git中，我们将这个目录的内容称为“附属于该仓库的工作树”。文件的编辑等操作在工作树种进行，然后记录到仓库中，以此管理文件的历史快照。如果想将文件恢复到原先的状态，可以从仓库中调取之前的快照，在工作树中打开。开发者可以通过这种方式获取以往的文件。
+查看仓库的状态
+git status
+git status命令用于显示Git仓库的状态。
+工作树和仓库在被操作的过程中，状态会不断发生变化。在Git操作过程中时常用git status命令查看当前状态，可谓基本中的基本。
+下面，就让我们来实际查看一下当前状态。
+$ git status
+On branch master
+
+Initial commit
+
+nothing to commit (create/copy files and use "git add" to track)
+结果显示了我们当前正处于master分支下。接着还显示了没有可提交的内容。所谓提交（Commit），是指“记录工作树中所有文件的当前状态”。
+尚没有可提交的内容，就是说当前我们建立的这个仓库中还没有记录任何文件的任何状态。这里，我们建议README.md文件作为管理对象，为第一次提交做前期准备。
+$ touch README.md
+$ git status
+On branch master
+
+Initial commit
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+可以看到在Untracked files中显示了README.md文件。类似地，只要对Git的工作树或仓库进行操作，git status命令的显示结果就会发生变化。
+向暂存区中添加文件
+git add
+如果只是用Git仓库的工作树创建了文件，那么该文件并不会被记入Git仓库的版本管理对象当中。因此我们用git status命令查看README.md文件时，它会显示在Untracked files里。
+要想让文件成为Git仓库的管理对象，就需要用git add命令将其加入暂存区（Stage或者Index）中。暂存区是提交之前的一个临时区域。
+$ git add README.md
+$ git status
+On branch master
+
+Initial commit
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+
+new file:   README.md
+将README.md文件加入暂存区后，git status命令的显示结果发生了变化。可以看到，README.md文件显示在Changes to be commited中了。
+保存仓库的历史记录
+git commit
+git commit命令可以将当前暂存区中的文件实际保存到仓库的历史记录中。通过这些记录，我们就可以在工作树中复原文件。
+记录一行提交信息
+我们来实际运行一下git commit命令。
+$ git commit -m "My first commit"
+[master (root-commit) 858ba4b] My first commit
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 README.md
+-m参数后的"My first commit"称作提交信息，是对这个提交的概述。
+记录详细提交信息
+刚才我们只简洁地记述了一行提交信息，如果想要记述得更加详细，请不加-m，直接执行git commit命令。执行后编辑器就会启动，并显示如下结果。
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Changes to be committed:
+#       modified:   README.md
+#
+在编辑器中记述提交信息的格式如下。
+第一行：用一行文字简述提交的更改内容
+第二行：空行
+第三行以后：记述更改的原因和详细内容
+只要按照上面的格式输入，今后便可以通过确认日志的命令或工具看到这些记录。
+在以#（井号）标为注释的Changes to be committed（要提交的更改）栏中，可以查看本次提交中包含的文件。将提交信息按格式记述完毕后，请保存并关闭编辑器，以#（井号）标为注释的行不必删除。随后，刚才记述的提交信息就会被提交。
+中止提交
+如果在编辑器启动后想中止提交，请将提交信息留空并直接关闭编辑器，随后提交就会被中止。
+查看提交后的状态
+执行完git commit命令后再来查看当前状态。
+$ git status
+On branch master
+nothing to commit, working directory clean
+当前工作树处于刚刚完成提交的最新状态，所以结果显示没有更改。
+查看提交日志
+git log
+git log命令可以查看以往仓库中提交的日志。包括可以查看什么人在什么时候进行了提交或合并，以及操作前后有怎样的差别。
+我们先来看看刚才的git commit命令是否被记录了。
+$ git log
+commit c75e47ad83d604e234eac38bb3aec57226f79974
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:01:24 2016 +0800
+
+    测试使用编辑器记述详细提交信息
+
+commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 22:49:19 2016 +0800
+
+    My first commit
+如上所示，显示了刚刚的提交操作。commit栏旁边显示的“c75e47......”是指向这个提交的哈希值。Git的其它命令中，在指向提交时会用到这个哈希值。
+Author栏中显示我们给Git设置的用户名和邮箱地址。Date栏中显示提交执行的日期和时间。再往下就是该提交的提交信息。
+只显示提交信息的第一行
+如果只想让程序显示第一行简述信息，可以在git log命令后加上--pretty=short。这样一来开发人员就能够更轻松地把握多个提交。
+$ git log --pretty=short
+commit c75e47ad83d604e234eac38bb3aec57226f79974
+Author: frankphper <1678723151@qq.com>
+
+    测试使用编辑器记述详细提交信息
+
+commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
+Author: frankphper <1678723151@qq.com>
+只显示指定目录、文件的日志
+只要在git log命令后加上目录名，便会只显示该目录下的日志。如果加的是文件名，就会只显示与该文件相关的日志。
+$ git log README.md
+显示文件的改动
+如果想查看提交所带来的改动，可以加上-p参数，文件的前后差别就会显示在提交信息之后。
+$ git log -p
+commit c75e47ad83d604e234eac38bb3aec57226f79974
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:01:24 2016 +0800
+
+    测试使用编辑器记述详细提交信息
+
+diff --git a/README.md b/README.md
+index e69de29..5dbdb31 100644
+--- a/README.md
++++ b/README.md
+@@ -0,0 +1 @@
++Git Learn
+
+commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 22:49:19 2016 +0800
+
+    My first commit
+
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..e69de29
+比如，执行下面的命令，就可以只查看README.md文件的提交日志以及提交后的差别。
+$ git log -p README.md
+如上所述，git log命令可以利用多种参数帮助开发者把握以往提交的内容。
+查看更改前后的差别
+git diff
+git diff命令可以查看工作树、暂存区、最新提交之间的差别。
+我们在刚刚提交的README.md中写点东西。
+#Git学习
+这里用Markdown语法写下了一行题目。
+查看工作树和暂存区的差别
+执行git diff命令，查看当前工作树与暂存区的差别。
+$ git diff
+diff --git a/README.md b/README.md
+index 5dbdb31..247921a 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,2 @@
+ Git Learn
++#Git学习
+由于我们尚未用git add命令向暂存区添加任何东西，所以程序只会显示工作树与最新提交状态之间的差别。
+这里解释一下显示的内容。“+”号标出的是新添加的行，被删除的行则用“-”号标出。我们可以看到，这次只添加了一行。
+用git add命令将README.md文件加入暂存区。
+$ git add README.md
+查看工作树和最新提交的差别
+如果现在执行git diff命令，由于工作树和暂存区的状态并无差别，结果什么都不会显示。要查看与最新提交的差别，请执行以下命令。
+$ git diff HEAD
+diff --git a/README.md b/README.md
+index 5dbdb31..247921a 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,2 @@
+ Git Learn
++#Git学习
+不妨养成这样一个好习惯：在执行git commit命令之前先执行git diff HEAD命令，查看本次提交与上次提交之间有什么差别，等确认完毕后再进行提交。这里HEAD是指向当前分支中最新一次提交的指针。
+由于我们刚刚确认过这两个提交之间的差别，所以直接运行git commit命令。
+$ git commit -m "Add #Git学习"
+[master c87f9ae] Add #Git学习
+ 1 file changed, 1 insertion(+)
+保险起见，我们查看一下提交日志，确认提交是否成功。
+$ git log
+commit c87f9ae6da0ccffedda289c55e55e7bc7900dfe0
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:33:16 2016 +0800
+
+    Add #Git学习
+
+commit c75e47ad83d604e234eac38bb3aec57226f79974
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:01:24 2016 +0800
+
+    测试使用编辑器记述详细提交信息
+
+commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 22:49:19 2016 +0800
+
+    My first commit
+成功查看了第三个提交。
