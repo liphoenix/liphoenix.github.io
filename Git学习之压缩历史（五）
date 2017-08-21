@@ -1,0 +1,125 @@
+压缩历史
+git rebase -i
+在合并特性分支之前，如果发现已提交的内容中有些许拼写错误等，不妨提交一个修改，然后将这个修改包含到前一个提交之中，压缩成一个历史记录。
+创建feature-C分支
+首先，新建一个feature-C特性分支。
+$ git checkout -b feature-C
+Switched to a new branch 'feature-C'
+我们在README.md文件中添加一行文字，并且故意拼写错误，以便之后修正。
+Git Learn
+#Git学习
+
+feature-A
+fix-B
+faeture-C
+我们用git commit -am命令。
+$ git commit -am "Add feature-C"
+[feature-C e57cbf9] Add feature-C
+ 1 file changed, 1 insertion(+)
+修正拼写错误
+修正README.md文件的内容，修正后的差别如下所示：
+$ git diff
+diff --git a/README.md b/README.md
+index a51326b..1fdef41 100644
+--- a/README.md
++++ b/README.md
+@@ -3,4 +3,4 @@ Git Learn
+
+ feature-A
+ fix-B
+-faeture-C
++feature-C
+然后进行提交。
+$ git commit -am "Fix typo"
+[feature-C a12e149] Fix typo
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+错字漏字等失误称作typo，所以我们将提交信息记为“Fix typo”。
+实际上，我们不希望在历史尽量中看到这类提交，因为健全的历史记录并不需要它们。如果能在最初提交之前就发现并修正这些错误，也就不会出现这类提交了。
+更改历史
+因此，我们来更改历史。将“Fix typo”修正的内容与之前一次的提交合并，在历史记录中合并为一次完美的提交。为此，我们要用到git rebase命令。
+$ git rebase -i HEAD-2
+fatal: Needed a single revision
+invalid upstream HEAD~2
+用上述方式执行git rebase命令，可以选定当前分支中包含HEAD（最新提交）在内的两个最新历史记录为对象，并在编辑器中打开。
+pick e57cbf9 Add feature-C
+pick a12e149 Fix typo
+
+# Rebase a51fda6..a12e149 onto a51fda6 (2 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
+我们将a12e149的Fix typo的历史记录压缩到e57cbf9的Add feature-C里。将a12e149左侧的pick部分删除，改写为fixup。
+保存编辑器里的内容，关闭编辑器。
+[detached HEAD ad10e53] Add feature-C
+ Date: Tue Apr 12 12:58:05 2016 +0800
+ 1 file changed, 1 insertion(+)
+Successfully rebased and updated refs/heads/feature-C.
+系统显示rebase成功。也就是以下面这两个提交作为对象，将“Fix typo”的内容合并到了上一个提交“Add feature-C”中，改写成了一个新的提交。
+e57cbf9 Add feature-C
+a12e149 Fix typo
+现在再查看提交日志时会发现Add feature-C的哈希值已经不是e57cbf9了，这证明提交已经被更改。
+$ git log --graph
+* commit ad10e53aad0618b3c3e850635a013f3e2eb44282
+| Author: frankphper <1678723151@qq.com>
+| Date:   Tue Apr 12 12:58:05 2016 +0800
+|
+|     Add feature-C
+|
+*   commit a51fda63bfebdb1c9f83b4385d8e8cfdacff9e19
+|\  Merge: a5f6cbf 6814da3
+| | Author: frankphper <1678723151@qq.com>
+| | Date:   Tue Apr 12 11:20:56 2016 +0800
+| |
+| |     Merge branch 'fix-B'
+| |
+| * commit 6814da3bcfc5935580f873190cb24f18db0017ec
+| | Author: frankphper <1678723151@qq.com>
+| | Date:   Tue Apr 12 09:49:32 2016 +0800
+| |
+| |     fix-B
+| |
+* |   commit a5f6cbf52a36dd104e131e32e67531656640c0c3
+|\ \  Merge: c87f9ae 320739b
+| |/  Author: frankphper <1678723151@qq.com>
+|/|   Date:   Mon Apr 11 08:16:48 2016 +0800
+| |
+| |       Merge branch 'feature-A'
+| |
+| * commit 320739b163a92ab90e24abfb814ab7fc09e9c9a0
+|/  Author: frankphper <1678723151@qq.com>
+|   Date:   Mon Apr 11 07:59:05 2016 +0800
+|
+|       Add feature-A
+|
+* commit c87f9ae6da0ccffedda289c55e55e7bc7900dfe0
+| Author: frankphper <1678723151@qq.com>
+| Date:   Sun Apr 10 23:33:16 2016 +0800
+|
+|     Add #Git学习
+|
+* commit c75e47ad83d604e234eac38bb3aec57226f79974
+这样一来，Fix typo就从历史中被抹去，也就相当于Add feature-C中从来没有出现过拼写错误。这算是一种良性的历史改写。
+合并至master分支
+我们将feature-C分支与master分支合并。
+$ git checkout master
+Switched to branch 'master'
+
+$ git merge --no-ff feature-C
+Merge made by the 'recursive' strategy.
+ README.md | 1 +
+ 1 file changed, 1 insertion(+)
+master分支整合了feature-C分支。
