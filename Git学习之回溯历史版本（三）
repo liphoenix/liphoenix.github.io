@@ -1,0 +1,79 @@
+回溯历史版本
+git reset
+通过前面学习的操作，我们已经学会如何在实现功能后进行提交，累积提交日志作为历史记录，借此不断培育一款软件。
+Git的另一特征便是可以灵活操作历史版本。借助分散仓库的优势，可以在不影响其他仓库的前提下对历史版本进行操作。
+在这里，为了让各位熟悉对历史版本的操作，我们先回溯历史版本，创建一个名为fix-B的特性分支。
+回溯到创建feature-A分支前
+让我们先回溯到上一节feature-A分支创建之前，创建一个名为fix-B的特性分支。
+要让仓库的HEAD、暂存区、当前工作树回溯到指定状态，需要用到git reset --hard命令。只要提供目标时间点的哈希值，就可以完全恢复至该时间点的状态。让我们执行下面的命令。
+$ git log
+commit a5f6cbf52a36dd104e131e32e67531656640c0c3
+Merge: c87f9ae 320739b
+Author: frankphper <1678723151@qq.com>
+Date:   Mon Apr 11 08:16:48 2016 +0800
+
+    Merge branch 'feature-A'
+
+commit 320739b163a92ab90e24abfb814ab7fc09e9c9a0
+Author: frankphper <1678723151@qq.com>
+Date:   Mon Apr 11 07:59:05 2016 +0800
+
+    Add feature-A
+
+commit c87f9ae6da0ccffedda289c55e55e7bc7900dfe0
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:33:16 2016 +0800
+
+    Add #Git学习
+
+commit c75e47ad83d604e234eac38bb3aec57226f79974
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 23:01:24 2016 +0800
+
+    测试使用编辑器记述详细提交信息
+
+commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
+Author: frankphper <1678723151@qq.com>
+Date:   Sun Apr 10 22:49:19 2016 +0800
+
+    My first commit
+
+$ git reset --hard c87f9ae6da0ccffedda289c55e55e7bc7900dfe0 
+HEAD is now at c87f9ae Add #Git学习
+我们已经成功回溯到特性分支（feature-A）创建之前的状态。由于所有文件都回溯到了指定哈希值对应的时间点上，README.md文件的内容也恢复到了当时的状态。
+创建fix-B分支
+现在我们来创建特性分支（fix-B）
+我们在README.md文件中添加一行文字。
+Git Learn
+#Git学习
+fix-B
+然后直接提交README.md文件。
+$ git add README.md
+$ git commit -m "fix-B"
+[fix-B 6814da3] fix-B
+ 1 file changed, 1 insertion(+)
+接下来，我们的目标是主干分支合并feature-A分支的修改后，又合并了fix-B的修改。
+推进至feature-A分之合并后的状态
+首先恢复到feature-A分支合并后的状态。不妨称这一操作为“推进历史”。
+git log命令只能查看以当前状态为终点的历史日志。所以这里要使用git reflog命令，查看当前仓库的操作日志。在日志中找出回溯历史之前的哈希值，通过git reset --hard命令恢复到回溯历史前的状态。
+首先执行git reflog命令，查看当前仓库执行过的操作的日志。
+$ git reflog
+6814da3 HEAD@{0}: commit: fix-B
+c87f9ae HEAD@{1}: reset: moving to c87f9ae6da0ccffedda289c55e55e7bc7900dfe0
+a5f6cbf HEAD@{2}: checkout: moving from master to fix-B
+a5f6cbf HEAD@{3}: merge feature-A: Merge made by the 'recursive' strategy.
+c87f9ae HEAD@{4}: checkout: moving from feature-A to master
+320739b HEAD@{5}: checkout: moving from master to feature-A
+c87f9ae HEAD@{6}: checkout: moving from feature-A to master
+320739b HEAD@{7}: commit: Add feature-A
+c87f9ae HEAD@{8}: checkout: moving from master to feature-A
+c87f9ae HEAD@{9}: commit: Add #Git学习
+c75e47a HEAD@{10}: commit: 测试使用编辑器记述详细提交信息
+858ba4b HEAD@{11}: commit (initial): My first commit
+在日志中，我们可以看到commit、checkout、reset、merge等Git命令的执行纪律。只要不进行Git的GC（Garbage Collection，垃圾回收），就可以通过日志随意调取近期的历史状态，就像给时间机器指定一个时间点，在过去未来中自由穿梭一般。即便开发者错误执行了Git操作，基本也都可以利用git reflog命令恢复到原先的状态。
+从上面数第四行表示feature-A特性分支合并后的状态，对应哈希值为a5f6cbf。我们将HEAD、暂存区、工作树恢复到这个时间点的状态。
+$ git checkout master
+Switched to branch 'master'
+$ git reset --hard a5f6cbf
+HEAD is now at a5f6cbf Merge branch 'feature-A'
+之前我们使用git reset --hard命令回溯了历史，这里又再次通过它恢复到了回溯前的历史状态。
