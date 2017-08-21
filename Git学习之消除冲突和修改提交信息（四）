@@ -1,0 +1,92 @@
+消除冲突
+现在我们只要合并fix-B分支，就会发生冲突。
+$ git merge --no-ff fix-B 
+Auto-merging README.md 
+CONFLICT (content): Merge conflict in README.md 
+Automatic merge failed; fix conflicts and then commit the result.
+系统告诉我们README.md文件发生了冲突（Conflict）。系统在合并README.md文件时，feature-A分支更改的部分与本次想要合并的fix-B分支更改的部分发生了冲突。
+不解决冲突就无法完成合并，所以我们打开README.md文件，解决这个冲突。
+查看冲突部分并将其解决
+用编辑器打开README.md文件，就会发现其内容变成了下面这个样子。
+Git Learn 
+#Git学习 
+<<<<<<< HEAD 
+feature-A 
+======= 
+fix-B 
+>>>>>>> fix-B
+=======
+以上的部分是当前HEAD的内容，以下的部分还要合并的fix-B分支中的内容。我们在编辑器中将其改成想要的样子。
+Git Learn 
+#Git学习 
+
+feature-A 
+fix-B
+如上所示，本次修正让feature-A与fix-B的内容并存于文件之中。但是在实际的软件开发中，往往需要删除其中之一，所以各位在处理冲突时，务必要仔细分析冲突部分的内容后再行修改。
+提交解决后的结果
+冲突解决后，执行git add命令与git commit命令。
+$ git add README.md 
+$ git commit -m "Fix conflict" 
+[master d8d0c37] Fix conflict
+由于本次更改解决了冲突，所以提交信息记为“Fix conflict”。
+修改提交信息
+git commit --amend
+要修改上一条提交信息，可以使用git commit --amend命令。
+我们将上一条提交信息记为了“Fix conflict”，但它其实是fix-B分支的合并，解决合并时发生的冲突只是过程之一，这样标记实在不妥。于是，我们要修改这条提交信息。
+$ git commit --amend
+执行上面的命令后，编辑器就会启动
+Fix conflict
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# Date:      Tue Apr 12 11:20:56 2016 +0800
+#
+# On branch master
+# Changes to be committed:
+#       modified:   README.md
+#
+编辑器中显示的内容如上所示，其中包含之前的提交信息。请将提交信息的部分修改为Merge branch 'fix-B'，然后保存文件，关闭编辑器。
+[master d1726c9] Merge branch 'fix-B'
+ Date: Tue Apr 12 11:20:56 2016 +0800
+随后会显示上面这条结果。现在执行git log --graph命令，可以看到提交日志中的相应内容也已经被修改。
+ git log --graph
+*   commit a51fda63bfebdb1c9f83b4385d8e8cfdacff9e19
+|\  Merge: a5f6cbf 6814da3
+| | Author: frankphper <1678723151@qq.com>
+| | Date:   Tue Apr 12 11:20:56 2016 +0800
+| |
+| |     Merge branch 'fix-B'
+| |
+| * commit 6814da3bcfc5935580f873190cb24f18db0017ec
+| | Author: frankphper <1678723151@qq.com>
+| | Date:   Tue Apr 12 09:49:32 2016 +0800
+| |
+| |     fix-B
+| |
+* |   commit a5f6cbf52a36dd104e131e32e67531656640c0c3
+|\ \  Merge: c87f9ae 320739b
+| |/  Author: frankphper <1678723151@qq.com>
+|/|   Date:   Mon Apr 11 08:16:48 2016 +0800
+| |
+| |       Merge branch 'feature-A'
+| |
+| * commit 320739b163a92ab90e24abfb814ab7fc09e9c9a0
+|/  Author: frankphper <1678723151@qq.com>
+|   Date:   Mon Apr 11 07:59:05 2016 +0800
+|
+|       Add feature-A
+|
+* commit c87f9ae6da0ccffedda289c55e55e7bc7900dfe0
+| Author: frankphper <1678723151@qq.com>
+| Date:   Sun Apr 10 23:33:16 2016 +0800
+|
+|     Add #Git学习
+|
+* commit c75e47ad83d604e234eac38bb3aec57226f79974
+| Author: frankphper <1678723151@qq.com>
+| Date:   Sun Apr 10 23:01:24 2016 +0800
+|
+|     测试使用编辑器记述详细提交信息
+|
+* commit 858ba4b5b0368c1af88856ea94c5cbbd9eab51fc
